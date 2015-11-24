@@ -100,10 +100,26 @@ redo_wifi(){
     fi
 }
 
+install_kalite(){
+    sudo apt-get install software-properties-common python-software-properties
+    sudo add-apt-repository ppa:learningequality/ka-lite
+    sudo apt-get update
+    sudo apt-get install ka-lite
+}
+
+# NEED TEST
+install_kiwix(){
+    wget http://download.kiwix.org/zim/other/oer4schools_en_all_2015-03.zim -O /tmp/oer4schools_en_all_2015-03.zim
+    wget http://download.kiwix.org/bin/0.9/kiwix-0.9-linux-x86_64.tar.bz2 -O /tmp/kiwix-0.9-linux-x86_64.tar.bz2
+    tar -jxvf /tmp/kiwix-0.9-linux-x86_64.tar.bz2
+    cd kiwix-0.9 && ./configure && make
+
+}
 #install kiwix
 # download kiwix-server-0.9-rc2-linux-armv5tejl.tar.bz2
 # tar -xjvf above file
 
+install_all_with_kiwix(){
 echo "Updating the system..."
 update
 install_packages
@@ -115,5 +131,40 @@ setup_samba
 setup_h5ai
 setup_realtek
 redo_wifi
+install_kiwix
+echo "Setup Complete"
+}
 
-echo "Setup complete..."
+install_all_with_kalite(){
+echo "Updating the system..."
+update
+install_packages
+configure_hotspot
+check_wifi
+configure_apache
+setup_hostname
+setup_samba
+setup_h5ai
+setup_realtek
+redo_wifi
+install_kalite
+echo "Setup Complete"
+}
+
+PS3='Please enter your choice: '
+options=("Install Rachelpios with Kalite" "Install Rachelpios with KiwiX" "Quit")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "Install Rachelpios with Kalite")
+            install_all_with_kalite
+            ;;
+        "Install Rachelpios with KiwiX")
+            install_all_with_kiwix
+            ;;
+        "Quit")
+            break
+            ;;
+        *) echo invalid option;;
+    esac
+done
